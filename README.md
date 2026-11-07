@@ -8,13 +8,11 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-RTDB-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![ESP32 FreeRTOS](https://img.shields.io/badge/ESP32-FreeRTOS-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](https://www.espressif.com/)
-[![CI/CD Pipeline](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
-[![Hosted on Render](https://img.shields.io/badge/Render-Live_Host-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 **An intelligent closed-loop IoT water reservoir management platform featuring real-time telemetry, optical turbidity quality verification, anti-tampering interlocks, fail-safe cloud synchronization, and an interactive 3D digital twin.**
 
-[Live Demo](#-hosting--deployment-guide) • [Architecture](#-system-architecture) • [Hardware BOM](#-hardware-specifications--pinout) • [Local Setup](#-getting-started-locally) • [Security Guide](#-protecting-important-data--security)
+[Architecture](#-system-architecture) • [Hardware BOM](#-hardware-specifications--pinout) • [Local Setup](#-getting-started-locally) • [GitHub Deploy](#-deploying-to-github) • [Team](#-engineering-team--institutional-attribution)
 
 ---
 
@@ -26,14 +24,11 @@
 2. [Core Features](#-core-features)
 3. [System Architecture](#-system-architecture)
 4. [Hardware Specifications & Pinout](#-hardware-specifications--pinout)
-5. [Protecting Important Data & Security](#-protecting-important-data--security)
-6. [Getting Started Locally](#-getting-started-locally)
-7. [Deploying to GitHub](#-deploying-to-github)
-8. [Continuous Integration & Continuous Deployment (CI/CD)](#-continuous-integration--continuous-deployment-cicd)
-9. [Hosting on Render](#-hosting-on-render)
-10. [Project Structure](#-project-structure)
-11. [Engineering Team & Institutional Attribution](#-engineering-team--institutional-attribution)
-12. [License](#-license)
+5. [Getting Started Locally](#-getting-started-locally)
+6. [Deploying to GitHub](#-deploying-to-github)
+7. [Project Structure](#-project-structure)
+8. [Engineering Team & Institutional Attribution](#-engineering-team--institutional-attribution)
+9. [License](#-license)
 
 ---
 
@@ -77,42 +72,99 @@ Domestic and industrial overhead water tanks encounter severe operational vulner
 
 ## 🏛️ System Architecture
 
+### Visual Data Flow & Interconnect Diagram
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                  PHYSICAL IoT HARDWARE LAYER (Overhead Reservoir)                │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│   [HW-038 Dual Probes] ──(GPIO 34 & 35)──┐                                       │
+│   (LOW: 20% | FULL: 90%)                 │                                       │
+│                                          ▼                                       │
+│   [Optical Turbidity] ──> [Divider] ──(GPIO 32 ADC1)─> [ESP32 DevKit V1]         │
+│   (Analog NTU Signal)   (5V to 3.3V)                   (Dual-Core 240 MHz        │
+│                                                        FreeRTOS Task Loops)      │
+│   [IR Lid Tamper] ───────(GPIO 27)───────┘                     │                 │
+│   (Intrusion Sensor)                                           │                 │
+│                                        ┌───────────────────────┴───────────────┐ │
+│                                        ▼                                       ▼ │
+│                              [Dual 5V Relay Module]                    [Buzzer &]│
+│                              (Galvanic Optocoupler)                    [LED Alarm]
+│                                   │          │                         (GPIO 23/ │
+│                           (GPIO 25)          (GPIO 26)                  18 & 19) │
+│                                   ▼          ▼                                   │
+│                             [12V Solenoid] [Submersible]                         │
+│                             [Inlet Valve ] [Water Pump ]                         │
+└───────────────────────────────────────┬──────────────────────────────────────────┘
+                                        │ WPA2 Wi-Fi / TLS Encrypted Stream (Core 0)
+                                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                         CLOUD TELEMETRY GATEWAY LAYER                            │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│                 [ Google Firebase Realtime Database (RTDB) ]                     │
+│                 • /telemetry (Water Level %, Turbidity NTU, Lid Status)          │
+│                 • /controls  (Pump Override, Solenoid Manual Clamp)              │
+│                 • /alerts    (Dry-run Lockout, Contamination, Tamper Logs)       │
+│                                                                                  │
+└───────────────────────────────────────┬──────────────────────────────────────────┘
+                                        │ Secure WebSockets / Real-Time JSON Stream
+                                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                       PRESENTATION & CONTROL DASHBOARD LAYER                     │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│                  [ AquaGuard Web Dashboard (React 18 + TypeScript) ]             │
+│                  • Real-Time 3D Reservoir Digital Twin with Wave Physics         │
+│                  • Optical Turbidity Gauge & Interlock Status Indicators         │
+│                  • Time-Series Telemetry Historian Charts (Recharts)             │
+│                  • Built-in Autonomous Hardware Physics Simulation Engine        │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Flowchart Representation
+
 ```mermaid
 flowchart TD
-    subgraph HardwareLayer["Physical IoT Hardware Layer (Overhead Reservoir)"]
-        HW038["HW-038 Dual Probes\n(LOW: 20% | FULL: 90%)"]
-        TURB["Optical Turbidity Sensor\n(5V Analog Conditioning)"]
-        IR["IR Obstacle Sensor\n(Lid Intrusion Detection)"]
-        
-        ESP["ESP32 DevKit V1\n(Dual-Core 240 MHz FreeRTOS)"]
-        
-        DIV["Resistive Voltage Divider\n(5V to 3.3V Step-down)"]
-        RELAY["Dual Optocoupler Relay Module\n(Galvanic 2500V Isolation)"]
-        SOL["12V DC Solenoid Valve\n(Municipal Inlet)"]
-        PUMP["Mini DC Submersible Pump\n(Distribution Booster)"]
-        BUZZ["Active 85 dB Piezo Buzzer\n& Dual Status LEDs"]
-        
-        HW038 -->|GPIO34 / GPIO35| ESP
-        TURB --> DIV -->|GPIO32 (ADC1_CH4)| ESP
-        IR -->|GPIO27| ESP
-        
-        ESP -->|GPIO25| RELAY --> SOL
-        ESP -->|GPIO26| RELAY --> PUMP
-        ESP -->|GPIO23 / 18 / 19| BUZZ
+    subgraph HW ["1. Physical IoT Hardware Layer"]
+        PROBES["HW-038 Dual Level Probes<br/>LOW 20% | FULL 90%"]
+        TURB["Optical Turbidity Sensor<br/>Water Clarity Analog Signal"]
+        DIV["Resistive Voltage Divider<br/>5V to 3.3V ADC Step-down"]
+        IR["IR Lid Tamper Sensor<br/>Intrusion Detection"]
+
+        ESP["ESP32 DevKit V1<br/>Dual-Core FreeRTOS Controller"]
+
+        RELAY["Dual Optocoupler Relay<br/>2500V Galvanic Isolation"]
+        SOL["12V DC Solenoid Valve<br/>Municipal Inlet Cutoff"]
+        PUMP["Submersible Booster Pump<br/>Water Distribution"]
+        ALARM["85dB Buzzer & Dual LEDs<br/>Local Alarm Indicators"]
+
+        PROBES -->|GPIO 34 & 35| ESP
+        TURB --> DIV
+        DIV -->|GPIO 32 ADC1| ESP
+        IR -->|GPIO 27| ESP
+
+        ESP -->|GPIO 25| RELAY
+        ESP -->|GPIO 26| RELAY
+        RELAY --> SOL
+        RELAY --> PUMP
+        ESP -->|GPIO 23, 18, 19| ALARM
     end
 
-    subgraph CloudLayer["Cloud & Telemetry Gateway"]
-        RTDB[("Firebase Realtime Database\n(JSON Telemetry Store)")]
-        ESP <-->|"TLS / WPA2 Wi-Fi (Core 0)"| RTDB
+    subgraph CLOUD ["2. Cloud Telemetry Gateway Layer"]
+        RTDB[("Firebase Realtime DB<br/>Cloud JSON Telemetry")]
     end
 
-    subgraph ClientLayer["Presentation & Control Layer (Render Hosted)"]
-        DASH["AquaGuard Web Application\n(React 18 + TypeScript + Vite)"]
-        SIM["Realistic Simulation Engine\n(Offline Fallback)"]
-        
-        RTDB <-->|"WebSocket / REST Live Sync"| DASH
-        SIM -.->|"Autonomous Fallback"| DASH
+    subgraph APP ["3. Presentation & Dashboard Layer"]
+        DASH["AquaGuard Web Application<br/>React 18 + TypeScript + Vite"]
+        SIM["Autonomous Simulation Engine<br/>High-Fidelity Physics Fallback"]
     end
+
+    ESP -->|Wi-Fi WPA2 / TLS| RTDB
+    RTDB -->|Live WebSockets| DASH
+    SIM -.->|Offline Mode Fallback| DASH
 ```
 
 ---
@@ -148,59 +200,6 @@ flowchart TD
 | **GPIO 23** | OUTPUT | Digital HIGH | 5V Active Piezo Buzzer | Audible warning for contamination or tampering |
 | **GPIO 18** | OUTPUT | Digital HIGH | Green 5mm LED | Steady illumination indicating healthy system state |
 | **GPIO 19** | OUTPUT | Digital HIGH | Red 5mm LED | Flashing illumination during active alarms |
-
----
-
-## 🔒 Protecting Important Data & Security
-
-Before uploading this project to GitHub or hosting it on Render, sensitive data must be strictly isolated to prevent leakage of API keys, database credentials, or project environment secrets.
-
-### 1. Robust `.gitignore` Implementation
-The repository includes a comprehensive `.gitignore` file that prevents accidental commits of:
-- **Environment variables**: `.env`, `.env.local`, `.env.production`
-- **Dependencies**: `node_modules/`
-- **Build artifacts & caches**: `dist/`, `.vite/`, `*.tsbuildinfo`
-- **Private keys & credentials**: `*.pem`, `*.key`, `serviceAccountKey*.json`
-- **Operating system files**: `.DS_Store`, `Thumbs.db`
-
-### 2. Using `.env.example` as a Template
-All secrets are decoupled using Vite environment variables prefixed with `VITE_`. A safe template `.env.example` is committed to the repository:
-
-```env
-# Copy this file to '.env' for local development or enter into Render dashboard
-VITE_FIREBASE_API_KEY=your_firebase_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-VITE_FIREBASE_DATABASE_URL=https://your_project_id-default-rtdb.firebaseio.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-> [!NOTE]
-> **Firebase is fully optional**: If no Firebase credentials are provided, AquaGuard automatically and seamlessly defaults to its built-in realistic simulation mode. The project will compile, build, and run without runtime crashes!
-
-### 3. Firebase Database Security Rules
-When deploying a Firebase Realtime Database for production hardware, secure your database rules so unauthorized users cannot alter relay states or override safety triggers:
-
-```json
-{
-  "rules": {
-    "telemetry": {
-      ".read": true,
-      ".write": "auth != null"
-    },
-    "controls": {
-      ".read": "auth != null",
-      ".write": "auth != null"
-    },
-    "messages": {
-      ".read": "auth != null",
-      ".write": true
-    }
-  }
-}
-```
 
 ---
 
@@ -247,19 +246,18 @@ When deploying a Firebase Realtime Database for production hardware, secure your
 
 ## 🚀 Deploying to GitHub
 
-Follow these steps to safely push your project to GitHub without leaking secrets:
+Follow these steps to safely push your project to GitHub:
 
 ### Step 1: Verify Git Status
-Run the following command to ensure that `node_modules`, `dist`, and `.env` are **not** staged:
+Run the following command to ensure all files are in order:
 ```bash
 git status
 ```
-*You should only see source files (`src/`, `public/`, `package.json`, `render.yaml`, `README.md`, etc.).*
 
 ### Step 2: Stage and Commit the Files
 ```bash
 git add .
-git commit -m "feat: complete AquaGuard smart tank platform with Render config & docs"
+git commit -m "feat: complete AquaGuard smart tank platform"
 ```
 
 ### Step 3: Link Remote and Push to GitHub
@@ -273,104 +271,6 @@ git remote add origin https://github.com/YOUR_USERNAME/AquaGuard.git
 # Push code to GitHub
 git push -u origin main
 ```
-
----
-
-## ⚙️ Continuous Integration & Continuous Deployment (CI/CD)
-
-The repository features an enterprise-grade automated CI/CD pipeline powered by **GitHub Actions** ([`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml)).
-
-```mermaid
-flowchart LR
-    A["Push / Pull Request\nto 'main'"] --> B["Continuous Integration (CI)"]
-    subgraph CI["Automated CI Verification"]
-        B1["Matrix: Node.js 18.x & 20.x"] --> B2["Clean Install (npm ci)"]
-        B2 --> B3["TypeScript Type Check (tsc)"]
-        B3 --> B4["Production Vite Build"]
-        B4 --> B5["Verify dist/ Output"]
-    end
-    B --> CI
-    CI -->|CI Passes on 'main'| C["Continuous Deployment (CD)"]
-    subgraph CD["Automated CD Pipeline"]
-        C1["Check Render Webhook Secret"]
-        C1 --> C2["Dispatch POST to Render Deploy Hook"]
-        C2 --> C3["Render Builds & Serves Static Site"]
-    end
-    C --> CD
-```
-
-### 1. Continuous Integration (CI Job)
-- **Triggers**: Every `push` and `pull_request` targeting the `main` branch.
-- **Matrix Testing**: Validates code builds against both **Node.js 18.x** and **Node.js 20.x** LTS environments.
-- **Type Safety Verification**: Runs `npm run typecheck` (`tsc --noEmit`) to verify zero TypeScript errors.
-- **Production Compilation**: Executes `npm run build` and asserts that `dist/index.html` is generated properly without missing assets.
-- **Artifact Archival**: Uploads the compiled `dist/` bundle as a verified GitHub Action artifact.
-
-### 2. Continuous Deployment (CD Job)
-- **Automatic Deployment Trigger**: Once the CI verification passes on `main`, the CD job notifies Render to initiate an immediate zero-downtime production deployment.
-- **Render Webhook Setup (Optional)**:
-  1. In your [Render Dashboard](https://dashboard.render.com/), open your `aquaguard-smart-tank` Static Site.
-  2. Navigate to **Settings** > **Deploy Hook** and copy the unique webhook URL (e.g. `https://api.render.com/deploy/srv-xxxxxx?key=yyyyyy`).
-  3. In your GitHub repository, navigate to **Settings** > **Secrets and variables** > **Actions** > **New repository secret**.
-  4. Name the secret `RENDER_DEPLOY_HOOK_URL` and paste the URL.
-  *(Note: If you have Render's native 'Auto-Deploy' enabled, Render also deploys automatically on every push! The workflow safely handles both modes).*
-
----
-
-## 🌐 Hosting on Render
-
-AquaGuard can be deployed on [Render](https://render.com/) as a high-performance **Static Site** in two simple ways:
-
-### Option A: 1-Click Blueprint Deploy (`render.yaml`)
-
-This repository includes a pre-configured `render.yaml` Blueprint file.
-
-1. Sign in to your [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** and select **Blueprint**.
-3. Connect your GitHub repository (`AquaGuard`).
-4. Render will automatically parse `render.yaml` and configure the build command (`npm run build`), publish directory (`dist`), and SPA rewrites (`/* -> /index.html`).
-5. (Optional) Enter your `VITE_FIREBASE_*` environment variables when prompted.
-6. Click **Apply** to deploy!
-
----
-
-### Option B: Manual Static Site Setup
-
-If you prefer to configure manually via the Render UI:
-
-1. In the Render Dashboard, click **New +** > **Static Site**.
-2. Connect your GitHub repository.
-3. Configure the following build parameters:
-
-   | Setting | Value |
-   | :--- | :--- |
-   | **Name** | `aquaguard-smart-tank` |
-   | **Branch** | `main` |
-   | **Root Directory** | *(Leave blank)* |
-   | **Build Command** | `npm run build` |
-   | **Publish Directory** | `dist` |
-
-4. **Configure Environment Variables** (Under the *Environment* tab):
-   Add any required variables:
-   - `VITE_FIREBASE_API_KEY`
-   - `VITE_FIREBASE_AUTH_DOMAIN`
-   - `VITE_FIREBASE_DATABASE_URL`
-   - `VITE_FIREBASE_PROJECT_ID`
-   - `VITE_FIREBASE_STORAGE_BUCKET`
-   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
-   - `VITE_FIREBASE_APP_ID`
-
-   *(If left empty, the application runs in simulation mode flawlessly!)*
-
-5. **Configure Single Page Application (SPA) Rewrites**:
-   - Go to **Redirects/Rewrites** in the Render site settings.
-   - Add a rule:
-     - **Type**: `Rewrite`
-     - **Source**: `/*`
-     - **Destination**: `/index.html`
-   *(This ensures client-side routes such as `#dashboard` or subpaths never return 404 errors on browser reload).*
-
-6. Click **Create Static Site**. Render will compile and launch your site with free SSL (`https://aquaguard-smart-tank.onrender.com`).
 
 ---
 
@@ -406,7 +306,7 @@ Aqua Guard/
     │   ├── Navbar.tsx           # Navigation bar with connection status & theme toggle
     │   ├── Hero.tsx             # Interactive hero showcase with telemetry pills
     │   ├── LiveDashboardPage.tsx# Dedicated real-time monitoring page
-    │   ├── FullCircuitPage.tsx  # Interactive interactive hardware schematic & pin viewer
+    │   ├── FullCircuitPage.tsx  # Interactive hardware schematic & pin viewer
     │   ├── ProjectInfoPage.tsx  # Institutional credentials & capstone team attribution
     │   ├── HardwareSection.tsx  # Component cards with modal deep-dives
     │   ├── HardwareDetailModal.tsx # Detailed hardware datasheets & wiring diagrams
