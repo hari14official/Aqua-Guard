@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <radialGradient id="greenGlow" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stopColor="#86efac"/>
+      <stop offset="30%" stopColor="#22c55e"/>
+      <stop offset="80%" stopColor="#15803d"/>
+      <stop offset="100%" stopColor="#14532d"/>
+    </radialGradient>
+    <radialGradient id="redGlow" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stopColor="#fca5a5"/>
+      <stop offset="30%" stopColor="#ef4444"/>
+      <stop offset="80%" stopColor="#b91c1c"/>
+      <stop offset="100%" stopColor="#7f1d1d"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* Dual LEDs Group */}
+  <g transform="translate(100, 40)">
+    {/* GREEN LED (Healthy Continuous Loop) */}
+    <g transform="translate(30, 0)">
+      {/* Light aura */}
+      <circle cx="35" cy="65" r="45" fill="#22c55e" opacity="0.15"/>
+      
+      {/* 5mm Dome */}
+      <path d="M 15 65 C 15 35, 55 35, 55 65 Z" fill="url(#greenGlow)"/>
+      <rect x="15" y="65" width="40" height="30" fill="url(#greenGlow)"/>
+      {/* Base Flange (Flat edge on cathode) */}
+      <rect x="12" y="95" width="46" height="6" rx="1" fill="#15803d"/>
+      
+      {/* Anode & Cathode Leads */}
+      <rect x="24" y="101" width="4" height="65" fill="#cbd5e1"/>
+      <rect x="42" y="101" width="4" height="50" fill="#cbd5e1"/>
+
+      {/* Gloss reflection highlight */}
+      <ellipse cx="26" cy="50" rx="6" ry="12" transform="rotate(-25 26 50)" fill="#ffffff" opacity="0.6"/>
+
+      <text x="35" y="180" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#4ade80" text-anchor="middle">GPIO18 (GREEN)</text>
+      <text x="35" y="195" font-family="monospace" font-size="8" fill="#86efac" text-anchor="middle">NORMAL LOOP</text>
+    </g>
+
+    {/* RED LED (Emergency Alert Interlock) */}
+    <g transform="translate(140, 0)">
+      {/* Light aura */}
+      <circle cx="35" cy="65" r="45" fill="#ef4444" opacity="0.15"/>
+
+      {/* 5mm Dome */}
+      <path d="M 15 65 C 15 35, 55 35, 55 65 Z" fill="url(#redGlow)"/>
+      <rect x="15" y="65" width="40" height="30" fill="url(#redGlow)"/>
+      <rect x="12" y="95" width="46" height="6" rx="1" fill="#b91c1c"/>
+
+      {/* Anode & Cathode Leads */}
+      <rect x="24" y="101" width="4" height="65" fill="#cbd5e1"/>
+      <rect x="42" y="101" width="4" height="50" fill="#cbd5e1"/>
+
+      {/* Gloss reflection */}
+      <ellipse cx="26" cy="50" rx="6" ry="12" transform="rotate(-25 26 50)" fill="#ffffff" opacity="0.6"/>
+
+      <text x="35" y="180" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#f87171" text-anchor="middle">GPIO19 (RED)</text>
+      <text x="35" y="195" font-family="monospace" font-size="8" fill="#fca5a5" text-anchor="middle">ALERT INTERLOCK</text>
+    </g>
+  </g>
+
+  <text x="200" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">5mm Diffused High-Brightness Optical Status LEDs (Green/Red)</text>
+</svg>

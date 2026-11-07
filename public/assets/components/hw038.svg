@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="probePcb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#1e3a8a"/>
+      <stop offset="100%" stopColor="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="goldPad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#fbbf24"/>
+      <stop offset="50%" stopColor="#d97706"/>
+      <stop offset="100%" stopColor="#f59e0b"/>
+    </linearGradient>
+    <filter id="probeGlow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* Dual Sensor Board Group */}
+  <g filter="url(#probeGlow)">
+    {/* Sensor Board 1 (LOW PROBE 20%) */}
+    <g transform="translate(110, 35)">
+      {/* Probe PCB substrate */}
+      <rect x="0" y="0" width="75" height="210" rx="6" fill="url(#probePcb)" stroke="#2563eb" stroke-width="1.5"/>
+      {/* Mounting hole */}
+      <circle cx="37.5" cy="18" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+      {/* Header Pins */}
+      <rect x="25" y="32" width="25" height="14" rx="2" fill="#1e293b" stroke="#64748b"/>
+      <circle cx="30" cy="39" r="2" fill="#fbbf24"/>
+      <circle cx="37.5" cy="39" r="2" fill="#fbbf24"/>
+      <circle cx="45" cy="39" r="2" fill="#fbbf24"/>
+      <text x="37.5" y="58" font-family="monospace" font-size="7" fill="#93c5fd" text-anchor="middle">GPIO34 (20%)</text>
+      
+      {/* Parallel Gold Traces */}
+      <g fill="url(#goldPad)">
+        <rect x="12" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="20" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="28" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="36" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="44" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="52" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="60" y="68" width="4" height="128" rx="1.5"/>
+      </g>
+      {/* Solder bridge busbars */}
+      <rect x="12" y="68" width="52" height="4" fill="url(#goldPad)"/>
+      <rect x="20" y="196" width="44" height="4" fill="url(#goldPad)"/>
+      <text x="37.5" y="206" font-family="monospace" font-size="6" fill="#38bdf8" text-anchor="middle">LOW PROBE</text>
+    </g>
+
+    {/* Sensor Board 2 (FULL PROBE 90%) */}
+    <g transform="translate(215, 35)">
+      <rect x="0" y="0" width="75" height="210" rx="6" fill="url(#probePcb)" stroke="#06b6d4" stroke-width="1.5"/>
+      <circle cx="37.5" cy="18" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+      <rect x="25" y="32" width="25" height="14" rx="2" fill="#1e293b" stroke="#64748b"/>
+      <circle cx="30" cy="39" r="2" fill="#fbbf24"/>
+      <circle cx="37.5" cy="39" r="2" fill="#fbbf24"/>
+      <circle cx="45" cy="39" r="2" fill="#fbbf24"/>
+      <text x="37.5" y="58" font-family="monospace" font-size="7" fill="#67e8f9" text-anchor="middle">GPIO35 (90%)</text>
+
+      <g fill="url(#goldPad)">
+        <rect x="12" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="20" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="28" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="36" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="44" y="68" width="4" height="128" rx="1.5"/>
+        <rect x="52" y="78" width="4" height="118" rx="1.5"/>
+        <rect x="60" y="68" width="4" height="128" rx="1.5"/>
+      </g>
+      <rect x="12" y="68" width="52" height="4" fill="url(#goldPad)"/>
+      <rect x="20" y="196" width="44" height="4" fill="url(#goldPad)"/>
+      <text x="37.5" y="206" font-family="monospace" font-size="6" fill="#38bdf8" text-anchor="middle">FULL PROBE</text>
+    </g>
+  </g>
+
+  <text x="200" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">HW-038 Solid-State Dual Immersion Probes (Pulsed 5ms)</text>
+</svg>

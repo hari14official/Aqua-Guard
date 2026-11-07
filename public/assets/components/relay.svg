@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="relayCube" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#2563eb"/>
+      <stop offset="100%" stopColor="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="termBlock" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#22c55e"/>
+      <stop offset="100%" stopColor="#15803d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* Main PCB Frame */}
+  <g transform="translate(60, 40)">
+    {/* Blue PCB Board */}
+    <rect x="0" y="0" width="280" height="180" rx="8" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+
+    {/* Mounting Holes */}
+    <circle cx="15" cy="15" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+    <circle cx="265" cy="15" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+    <circle cx="15" cy="165" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+    <circle cx="265" cy="165" r="4.5" fill="#090d16" stroke="#fbbf24" stroke-width="1.5"/>
+
+    {/* Relay Channel 1: SONGLE Cube */}
+    <rect x="40" y="35" width="85" height="105" rx="4" fill="url(#relayCube)" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="82.5" y="60" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#ffffff" text-anchor="middle">SONGLE</text>
+    <text x="82.5" y="75" font-family="monospace" font-size="8" font-weight="bold" fill="#bfdbfe" text-anchor="middle">SRD-05VDC-SL-C</text>
+    <text x="82.5" y="90" font-family="monospace" font-size="7" fill="#93c5fd" text-anchor="middle">10A 250VAC</text>
+    <text x="82.5" y="102" font-family="monospace" font-size="7" fill="#93c5fd" text-anchor="middle">10A 30VDC</text>
+    <text x="82.5" y="125" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">CH1 • PUMP</text>
+
+    {/* Relay Channel 2: SONGLE Cube */}
+    <rect x="155" y="35" width="85" height="105" rx="4" fill="url(#relayCube)" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="197.5" y="60" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#ffffff" text-anchor="middle">SONGLE</text>
+    <text x="197.5" y="75" font-family="monospace" font-size="8" font-weight="bold" fill="#bfdbfe" text-anchor="middle">SRD-05VDC-SL-C</text>
+    <text x="197.5" y="90" font-family="monospace" font-size="7" fill="#93c5fd" text-anchor="middle">10A 250VAC</text>
+    <text x="197.5" y="102" font-family="monospace" font-size="7" fill="#93c5fd" text-anchor="middle">10A 30VDC</text>
+    <text x="197.5" y="125" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">CH2 • VALVE</text>
+
+    {/* EL817 Optocouplers (Galvanic isolation) */}
+    <rect x="70" y="146" width="25" height="18" rx="2" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="82.5" y="158" font-family="monospace" font-size="6" fill="#cbd5e1" text-anchor="middle">EL817</text>
+
+    <rect x="185" y="146" width="25" height="18" rx="2" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="197.5" y="158" font-family="monospace" font-size="6" fill="#cbd5e1" text-anchor="middle">EL817</text>
+
+    {/* High Current Output Terminal Blocks (Top) */}
+    <g transform="translate(40, -12)">
+      <rect x="0" y="0" width="85" height="28" rx="3" fill="url(#termBlock)" stroke="#166534" stroke-width="1.5"/>
+      <circle cx="15" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="12" y1="14" x2="18" y2="14" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="42.5" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="39.5" y1="14" x2="45.5" y2="14" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="70" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="67" y1="14" x2="73" y2="14" stroke="#1e293b" stroke-width="2"/>
+    </g>
+
+    <g transform="translate(155, -12)">
+      <rect x="0" y="0" width="85" height="28" rx="3" fill="url(#termBlock)" stroke="#166534" stroke-width="1.5"/>
+      <circle cx="15" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="12" y1="14" x2="18" y2="14" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="42.5" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="39.5" y1="14" x2="45.5" y2="14" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="70" cy="14" r="5" fill="#f8fafc" stroke="#334155"/>
+      <line x1="67" y1="14" x2="73" y2="14" stroke="#1e293b" stroke-width="2"/>
+    </g>
+
+    {/* Low Voltage Input Header (Right) */}
+    <g transform="translate(268, 65)">
+      <rect x="0" y="0" width="16" height="50" rx="2" fill="#1e293b" stroke="#64748b"/>
+      <circle cx="8" cy="10" r="2" fill="#fbbf24"/>
+      <circle cx="8" cy="20" r="2" fill="#fbbf24"/>
+      <circle cx="8" cy="30" r="2" fill="#fbbf24"/>
+      <circle cx="8" cy="40" r="2" fill="#fbbf24"/>
+    </g>
+  </g>
+
+  <text x="200" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">5V Dual-Channel Optocoupler Relay Module (2500V Isolation)</text>
+</svg>

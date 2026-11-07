@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#f59e0b"/>
+      <stop offset="40%" stopColor="#d97706"/>
+      <stop offset="100%" stopColor="#78350f"/>
+    </linearGradient>
+    <linearGradient id="solenoidCoil" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#1e293b"/>
+      <stop offset="50%" stopColor="#334155"/>
+      <stop offset="100%" stopColor="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* Solenoid Valve Body */}
+  <g transform="translate(90, 45)">
+    {/* Solenoid Electromagnetic Coil (Top) */}
+    <rect x="65" y="10" width="90" height="85" rx="6" fill="url(#solenoidCoil)" stroke="#475569" stroke-width="2"/>
+    <rect x="75" y="20" width="70" height="40" rx="3" fill="#0f172a"/>
+    <text x="110" y="38" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#38bdf8" text-anchor="middle">12V DC</text>
+    <text x="110" y="52" font-family="monospace" font-size="8" fill="#94a3b8" text-anchor="middle">NORMALLY CLOSED</text>
+
+    {/* Top terminals */}
+    <rect x="90" y="0" width="12" height="12" rx="1" fill="#cbd5e1" stroke="#334155"/>
+    <rect x="118" y="0" width="12" height="12" rx="1" fill="#cbd5e1" stroke="#334155"/>
+    <line x1="96" y1="2" x2="96" y2="10" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="124" y1="2" x2="124" y2="10" stroke="#f59e0b" stroke-width="2"/>
+
+    {/* Intermediate Guide Tube */}
+    <rect x="95" y="95" width="30" height="25" fill="#475569"/>
+
+    {/* Brass Valve Body (Bottom Manifold) */}
+    <path d="M 20 120 L 200 120 L 200 180 L 150 180 L 150 195 L 70 195 L 70 180 L 20 180 Z" fill="url(#brassGrad)" stroke="#b45309" stroke-width="2"/>
+
+    {/* Inlet Port (Left 1/2" Threaded) */}
+    <rect x="0" y="130" width="22" height="40" rx="2" fill="url(#brassGrad)" stroke="#78350f" stroke-width="1.5"/>
+    {/* Thread grooves */}
+    <line x1="4" y1="130" x2="4" y2="170" stroke="#78350f" stroke-width="2"/>
+    <line x1="10" y1="130" x2="10" y2="170" stroke="#78350f" stroke-width="2"/>
+    <line x1="16" y1="130" x2="16" y2="170" stroke="#78350f" stroke-width="2"/>
+
+    {/* Outlet Port (Right 1/2" Threaded) */}
+    <rect x="198" y="130" width="22" height="40" rx="2" fill="url(#brassGrad)" stroke="#78350f" stroke-width="1.5"/>
+    <line x1="204" y1="130" x2="204" y2="170" stroke="#78350f" stroke-width="2"/>
+    <line x1="210" y1="130" x2="210" y2="170" stroke="#78350f" stroke-width="2"/>
+    <line x1="216" y1="130" x2="216" y2="170" stroke="#78350f" stroke-width="2"/>
+
+    {/* Direction Arrow on valve body */}
+    <path d="M 90 150 L 120 150 L 120 144 L 132 150 L 120 156 L 120 150 Z" fill="#ffffff" opacity="0.85"/>
+    <text x="110" y="172" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">FLOW INLET &rarr;</text>
+  </g>
+
+  <text x="200" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">12V DC Normally-Closed (NC) Fail-Safe Solenoid Valve</text>
+</svg>

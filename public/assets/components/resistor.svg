@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="resistorBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#93c5fd"/>
+      <stop offset="50%" stopColor="#60a5fa"/>
+      <stop offset="100%" stopColor="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* Resistor Divider Pair Group */}
+  <g transform="translate(60, 50)">
+    {/* Resistor 1: 10 kΩ (Brown-Black-Black-Red-Brown 1%) */}
+    <g transform="translate(0, 20)">
+      {/* Axial wire lead */}
+      <line x1="10" y1="35" x2="270" y2="35" stroke="#cbd5e1" stroke-width="4"/>
+
+      {/* Ceramic Dogbone body */}
+      <path d="M 70 20 C 85 20, 85 24, 95 24 L 185 24 C 195 24, 195 20, 210 20 L 210 50 C 195 50, 195 46, 185 46 L 95 46 C 85 46, 85 50, 70 50 Z" fill="url(#resistorBody)" stroke="#1d4ed8" stroke-width="1.5"/>
+
+      {/* 5-Band Color Bands (10 kΩ 1%) */}
+      {/* 1. Brown = 1 */}
+      <rect x="100" y="24" width="8" height="22" fill="#78350f"/>
+      {/* 2. Black = 0 */}
+      <rect x="116" y="24" width="8" height="22" fill="#000000"/>
+      {/* 3. Black = 0 */}
+      <rect x="132" y="24" width="8" height="22" fill="#000000"/>
+      {/* 4. Red = x100 */}
+      <rect x="148" y="24" width="8" height="22" fill="#ef4444"/>
+      {/* 5. Brown = 1% Tol */}
+      <rect x="175" y="24" width="8" height="22" fill="#78350f"/>
+
+      <text x="140" y="12" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#bfdbfe" text-anchor="middle">R1 = 10 kΩ (1% Metal Film)</text>
+    </g>
+
+    {/* Resistor 2: 20 kΩ (Red-Black-Black-Red-Brown 1%) */}
+    <g transform="translate(0, 95)">
+      <line x1="10" y1="35" x2="270" y2="35" stroke="#cbd5e1" stroke-width="4"/>
+
+      <path d="M 70 20 C 85 20, 85 24, 95 24 L 185 24 C 195 24, 195 20, 210 20 L 210 50 C 195 50, 195 46, 185 46 L 95 46 C 85 46, 85 50, 70 50 Z" fill="url(#resistorBody)" stroke="#1d4ed8" stroke-width="1.5"/>
+
+      {/* 5-Band Color Bands (20 kΩ 1%) */}
+      {/* 1. Red = 2 */}
+      <rect x="100" y="24" width="8" height="22" fill="#ef4444"/>
+      {/* 2. Black = 0 */}
+      <rect x="116" y="24" width="8" height="22" fill="#000000"/>
+      {/* 3. Black = 0 */}
+      <rect x="132" y="24" width="8" height="22" fill="#000000"/>
+      {/* 4. Red = x100 */}
+      <rect x="148" y="24" width="8" height="22" fill="#ef4444"/>
+      {/* 5. Brown = 1% Tol */}
+      <rect x="175" y="24" width="8" height="22" fill="#78350f"/>
+
+      <text x="140" y="12" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#bfdbfe" text-anchor="middle">R2 = 20 kΩ (1% Metal Film)</text>
+    </g>
+
+    {/* Mathematical Division Annotation */}
+    <text x="140" y="165" font-family="monospace" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">V_ESP32 = V_TURB × (20k / (10k + 20k)) = 0.666 × 5V = 3.3V Max</text>
+  </g>
+
+  <text x="200" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">Precision Metal Film Resistor Divider (0-5V to 0-3.3V ESP32 ADC1 Protection)</text>
+</svg>

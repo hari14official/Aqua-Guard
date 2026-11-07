@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="pcbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0f172a"/>
+      <stop offset="100%" stopColor="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="metalShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#e2e8f0"/>
+      <stop offset="50%" stopColor="#94a3b8"/>
+      <stop offset="100%" stopColor="#64748b"/>
+    </linearGradient>
+    <linearGradient id="goldTrace" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#f59e0b"/>
+      <stop offset="100%" stopColor="#fbbf24"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  {/* Background glow frame */}
+  <rect width="400" height="300" rx="16" fill="#090d16"/>
+  <rect x="15" y="15" width="370" height="270" rx="12" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  {/* PCB Body */}
+  <g filter="url(#shadow)">
+    <rect x="110" y="30" width="180" height="240" rx="8" fill="url(#pcbGrad)" stroke="#334155" stroke-width="2"/>
+    {/* Corner mounting holes */}
+    <circle cx="122" cy="42" r="5" fill="#090d16" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="278" cy="42" r="5" fill="#090d16" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="122" cy="258" r="5" fill="#090d16" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="278" cy="258" r="5" fill="#090d16" stroke="#f59e0b" stroke-width="1.5"/>
+
+    {/* Meander PCB Wi-Fi Antenna */}
+    <rect x="140" y="36" width="120" height="24" rx="2" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+    <path d="M 148 48 L 158 48 L 158 40 L 168 40 L 168 48 L 178 48 L 178 40 L 188 40 L 188 48 L 198 48 L 198 40 L 208 40 L 208 48 L 218 48 L 218 40 L 228 40 L 228 48 L 238 48 L 238 40 L 248 40" fill="none" stroke="url(#goldTrace)" stroke-width="2.5" stroke-linecap="round"/>
+
+    {/* Metal RF Shield Can (ESP-WROOM-32) */}
+    <rect x="135" y="66" width="130" height="96" rx="4" fill="url(#metalShield)" stroke="#cbd5e1" stroke-width="1.5"/>
+    {/* Shield details */}
+    <circle cx="150" cy="80" r="3" fill="#475569"/>
+    <text x="200" y="105" font-family="system-ui, sans-serif" font-size="13" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="1">ESPRESSIF</text>
+    <text x="200" y="122" font-family="monospace" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">ESP-WROOM-32</text>
+    <text x="200" y="136" font-family="monospace" font-size="8" fill="#334155" text-anchor="middle">Wi-Fi + BT 4.2 BLE</text>
+    <text x="200" y="148" font-family="monospace" font-size="7" fill="#475569" text-anchor="middle">FCC ID: 2AC7Z-ESPWROOM32</text>
+
+    {/* USB-UART Bridge IC (CP2102) */}
+    <rect x="180" y="176" width="40" height="30" rx="2" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <circle cx="186" cy="182" r="1.5" fill="#94a3b8"/>
+    <text x="200" y="195" font-family="monospace" font-size="7" fill="#38bdf8" text-anchor="middle">CP2102</text>
+
+    {/* MicroUSB Port */}
+    <rect x="175" y="248" width="50" height="24" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+    <rect x="185" y="262" width="30" height="8" rx="1.5" fill="#1e293b"/>
+
+    {/* EN & BOOT Tactile Buttons */}
+    <rect x="122" y="228" width="16" height="18" rx="2" fill="#334155"/>
+    <circle cx="130" cy="237" r="4" fill="#cbd5e1"/>
+    <text x="130" y="222" font-family="monospace" font-size="7" fill="#94a3b8" text-anchor="middle">EN</text>
+
+    <rect x="262" y="228" width="16" height="18" rx="2" fill="#334155"/>
+    <circle cx="270" cy="237" r="4" fill="#cbd5e1"/>
+    <text x="270" y="222" font-family="monospace" font-size="7" fill="#94a3b8" text-anchor="middle">BOOT</text>
+
+    {/* Status LEDs */}
+    <rect x="146" y="200" width="8" height="6" rx="1" fill="#ef4444"/>
+    <rect x="246" y="200" width="8" height="6" rx="1" fill="#3b82f6"/>
+
+    {/* Dual Inline Header Pins (Left 15 pins) */}
+    <g fill="#f59e0b">
+      {/* Repeated gold pin pads */}
+      <rect x="98" y="46" width="12" height="6" rx="1"/>
+      <rect x="98" y="60" width="12" height="6" rx="1"/>
+      <rect x="98" y="74" width="12" height="6" rx="1"/>
+      <rect x="98" y="88" width="12" height="6" rx="1"/>
+      <rect x="98" y="102" width="12" height="6" rx="1"/>
+      <rect x="98" y="116" width="12" height="6" rx="1"/>
+      <rect x="98" y="130" width="12" height="6" rx="1"/>
+      <rect x="98" y="144" width="12" height="6" rx="1"/>
+      <rect x="98" y="158" width="12" height="6" rx="1"/>
+      <rect x="98" y="172" width="12" height="6" rx="1"/>
+      <rect x="98" y="186" width="12" height="6" rx="1"/>
+      <rect x="98" y="200" width="12" height="6" rx="1"/>
+      <rect x="98" y="214" width="12" height="6" rx="1"/>
+      <rect x="98" y="228" width="12" height="6" rx="1"/>
+      <rect x="98" y="242" width="12" height="6" rx="1"/>
+    </g>
+
+    {/* Dual Inline Header Pins (Right 15 pins) */}
+    <g fill="#f59e0b">
+      <rect x="290" y="46" width="12" height="6" rx="1"/>
+      <rect x="290" y="60" width="12" height="6" rx="1"/>
+      <rect x="290" y="74" width="12" height="6" rx="1"/>
+      <rect x="290" y="88" width="12" height="6" rx="1"/>
+      <rect x="290" y="102" width="12" height="6" rx="1"/>
+      <rect x="290" y="116" width="12" height="6" rx="1"/>
+      <rect x="290" y="130" width="12" height="6" rx="1"/>
+      <rect x="290" y="144" width="12" height="6" rx="1"/>
+      <rect x="290" y="158" width="12" height="6" rx="1"/>
+      <rect x="290" y="172" width="12" height="6" rx="1"/>
+      <rect x="290" y="186" width="12" height="6" rx="1"/>
+      <rect x="290" y="200" width="12" height="6" rx="1"/>
+      <rect x="290" y="214" width="12" height="6" rx="1"/>
+      <rect x="290" y="228" width="12" height="6" rx="1"/>
+      <rect x="290" y="242" width="12" height="6" rx="1"/>
+    </g>
+  </g>
+
+  {/* Header banner text */}
+  <text x="200" y="290" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">ESP32 DevKit V1 • 240MHz Dual-Core MCU</text>
+</svg>

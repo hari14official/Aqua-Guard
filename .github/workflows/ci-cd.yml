@@ -1,0 +1,102 @@
+name: AquaGuard CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same ref if a new push arrives
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # Continuous Integration (CI) - Verification, Type Checking & Build
+  # ============================================================================
+  ci:
+    name: Build & Verify (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 📦 Install Clean Dependencies
+        run: npm ci
+
+      - name: 🔍 TypeScript Type Check
+        run: npm run typecheck
+
+      - name: 🏗️ Compile Production Bundle (Vite)
+        run: npm run build
+
+      - name: 🛡️ Verify Build Integrity
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ Error: dist/index.html was not generated!"
+            exit 1
+          fi
+          echo "✅ Production bundle generated successfully."
+          echo "dist size: $(du -sh dist | cut -f1)"
+
+      - name: 💾 Upload Build Artifact
+        if: matrix.node-version == '20.x' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aquaguard-dist
+          path: dist/
+          retention-days: 7
+
+  # ============================================================================
+  # Continuous Deployment (CD) - Deploy to Render
+  # ============================================================================
+  cd:
+    name: Deploy to Render
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🚀 Trigger Render Deployment
+        env:
+          RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_HOOK" ]; then
+            echo "📡 Deploying to Render via Webhook..."
+            HTTP_RESPONSE=$(curl -s -o response.txt -w "%{http_code}" -X POST "$RENDER_HOOK")
+            echo "HTTP Status Code: $HTTP_RESPONSE"
+            cat response.txt
+            if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
+              echo "✅ Render deployment successfully triggered!"
+            else
+              echo "❌ Render deployment hook failed with status $HTTP_RESPONSE"
+              exit 1
+            fi
+          else
+            echo "ℹ️ [Notice] RENDER_DEPLOY_HOOK_URL secret is not set in GitHub repository settings."
+            echo "ℹ️ If your Render service has 'Auto-Deploy' enabled (default when linked to GitHub), Render deploys automatically on every push to main."
+            echo "ℹ️ To trigger deploys explicitly via this workflow, copy your Deploy Hook from Render Dashboard (Service Settings > Deploy Hook) and save it as RENDER_DEPLOY_HOOK_URL under GitHub Repo > Settings > Secrets and variables > Actions."
+          fi
+
+      - name: 📋 Deployment Summary
+        run: |
+          echo "### 🚀 AquaGuard Deployment Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered By**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Environment**: [Render Static Site](https://dashboard.render.com/)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: CI Passed & Deployment Trigger Dispatched" >> $GITHUB_STEP_SUMMARY
