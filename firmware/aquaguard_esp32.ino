@@ -65,6 +65,14 @@ String currentMode  = "AUTO";
 unsigned long lastUploadTime = 0;
 const unsigned long UPLOAD_INTERVAL = 2000; // Push telemetry every 2 seconds
 
+// Buzzer alert pattern: 5 alert pulses with 2-second gap (2000ms)
+bool prevHazardState         = false;
+int buzzerBeepsRemaining     = 0;
+unsigned long buzzerTimer    = 0;
+bool buzzerIsBeeping         = false;
+const unsigned long BEEP_DUR = 250;  // 250ms audible tone
+const unsigned long BEEP_GAP = 2000; // 2 seconds gap between beeps
+
 // -----------------------------------------------------------------------------
 // 4. SENSOR READING FUNCTIONS
 // -----------------------------------------------------------------------------
@@ -270,9 +278,16 @@ void loop() {
 
     digitalWrite(PIN_RELAY_SOLENOID, HIGH); // Cut valve (Active LOW)
     digitalWrite(PIN_RELAY_PUMP, HIGH);     // Cut pump (Active LOW)
-    digitalWrite(PIN_BUZZER, HIGH);          // Sound 85dB buzzer
     digitalWrite(PIN_LED_RED, HIGH);         // Red Alert LED
     digitalWrite(PIN_LED_GREEN, LOW);
+
+    // Trigger 5 alert buzzer pulses with 2-second gap on entering hazard state
+    if (!prevHazardState) {
+      buzzerBeepsRemaining = 5;
+      buzzerTimer = millis();
+      buzzerIsBeeping = true;
+      digitalWrite(PIN_BUZZER, HIGH);
+    }
 
     if (turbStatus == "DIRTY") {
       systemState = "CONTAMINATION_ALERT";
@@ -283,6 +298,8 @@ void loop() {
     }
   } else {
     alarmState = false;
+    buzzerBeepsRemaining = 0;
+    buzzerIsBeeping = false;
     digitalWrite(PIN_BUZZER, LOW);
     digitalWrite(PIN_LED_RED, LOW);
     digitalWrite(PIN_LED_GREEN, HIGH); // Healthy green LED
@@ -307,6 +324,29 @@ void loop() {
       digitalWrite(PIN_RELAY_SOLENOID, valveState ? LOW : HIGH);
       digitalWrite(PIN_RELAY_PUMP, pumpState ? LOW : HIGH);
     }
+  }
+
+  prevHazardState = isHazard;
+
+  // Non-blocking 5-pulse buzzer sounder with 2-second gap
+  if (buzzerBeepsRemaining > 0) {
+    unsigned long elapsed = millis() - buzzerTimer;
+    if (buzzerIsBeeping) {
+      if (elapsed >= BEEP_DUR) {
+        digitalWrite(PIN_BUZZER, LOW);
+        buzzerIsBeeping = false;
+        buzzerTimer = millis();
+        buzzerBeepsRemaining--;
+      }
+    } else {
+      if (elapsed >= BEEP_GAP && buzzerBeepsRemaining > 0) {
+        digitalWrite(PIN_BUZZER, HIGH);
+        buzzerIsBeeping = true;
+        buzzerTimer = millis();
+      }
+    }
+  } else {
+    digitalWrite(PIN_BUZZER, LOW);
   }
 
   // D. Periodic Telemetry Streaming to Firebase (Every 2 seconds)

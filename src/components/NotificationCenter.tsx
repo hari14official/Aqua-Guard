@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   BellRing, 
   ShieldAlert, 
@@ -6,9 +6,12 @@ import {
   CheckCircle2, 
   WifiOff, 
   Trash2, 
-  Check
+  Check,
+  Volume2,
+  Square
 } from 'lucide-react';
 import { SmartAlert } from '../types/tank';
+import { soundService } from '../services/soundService';
 
 interface NotificationCenterProps {
   alerts: SmartAlert[];
@@ -21,6 +24,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onMarkRead,
   onClearAll,
 }) => {
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  const handleTestAudio = () => {
+    if (isPlayingAudio) {
+      soundService.stopAll();
+      setIsPlayingAudio(false);
+      return;
+    }
+
+    setIsPlayingAudio(true);
+    soundService.playNotification(5, 2000);
+
+    setTimeout(() => {
+      setIsPlayingAudio(false);
+    }, 8500);
+  };
+
   const formatTime = (ts: number) => {
     const diff = Math.max(0, Math.round((Date.now() - ts) / 1000));
     if (diff < 60) return `${diff}s ago`;
@@ -99,15 +119,39 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 </span>
               </div>
 
-              {alerts.length > 0 && (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={onClearAll}
-                  className="text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1 transition-colors"
+                  onClick={handleTestAudio}
+                  title="Play Notification (Alert) Sound 5 times with 2-second gap"
+                  className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    isPlayingAudio
+                      ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800 animate-pulse'
+                      : 'bg-brand-50 hover:bg-brand-100 dark:bg-brand-950 dark:hover:bg-brand-900 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800'
+                  }`}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear All</span>
+                  {isPlayingAudio ? (
+                    <>
+                      <Square className="w-3 h-3 fill-current" />
+                      <span>Stop (Playing 5x)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 text-brand-500" />
+                      <span>Play Alert (5x @ 2s)</span>
+                    </>
+                  )}
                 </button>
-              )}
+
+                {alerts.length > 0 && (
+                  <button
+                    onClick={onClearAll}
+                    className="text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear All</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* List of Alerts */}

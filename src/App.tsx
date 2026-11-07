@@ -63,9 +63,10 @@ export const App: React.FC = () => {
       new Notification("AquaGuard Alert", { body: message });
     }
 
+    const displayDuration = type === 'error' || type === 'warning' ? 9500 : 5000;
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
+    }, displayDuration);
   };
 
   // Dark mode effect

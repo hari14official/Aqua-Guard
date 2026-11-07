@@ -310,8 +310,8 @@ void evaluatePumpAutomation(float levelPercent, bool isWaterClean) {
     howItWorks: {
       physicalPrinciple: "Contains an internal multivibrator that oscillates automatically at 2.3 kHz when DC voltage is applied across its piezoelectric ceramic diaphragm.",
       signalProcessing: "Driven via 2N2222 NPN transistor buffer or directly from GPIO23 with current limiting.",
-      esp32Interaction: "Pulsed alarm sequence: 250ms ON / 250ms OFF during contamination alert; continuous 1000ms chirp upon tank full state.",
-      failSafeMechanism: "Software mute timeout disables continuous buzzing after 60 seconds to prevent neighborhood annoyance while preserving visual Red LED alert."
+      esp32Interaction: "Pulsed alarm sequence: 5 alert pulses with 2-second gap (250ms ON / 2000ms OFF) during contamination or intrusion alert; continuous status LED interlock.",
+      failSafeMechanism: "Buzzer pulses exactly 5 times with 2-second interval upon hazard trigger to alert occupants without continuous neighborhood disturbance, while visual Red LED remains locked ON."
     },
     specs: [
       { label: "Rated Voltage", value: "5V DC (operates from 3.3V - 5.5V)" },
@@ -324,13 +324,15 @@ void evaluatePumpAutomation(float levelPercent, bool isWaterClean) {
       { pinName: "VCC (+)", esp32Pin: "GPIO23", signalType: "Digital Output", voltage: "3.3V - 5V", notes: "Driven through 100Ω protection resistor" },
       { pinName: "GND (-)", esp32Pin: "GND", signalType: "Ground", voltage: "0V", notes: "Common system ground" }
     ],
-    codeSnippet: `// Alarm Beep Sequence
+    codeSnippet: `// 5-Pulse Alert Beep Sequence with 2-Second Gap
 void soundAlarmAlert() {
-  for(int i = 0; i < 3; i++) {
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(150);
-    digitalWrite(BUZZER_PIN, LOW);
-    delay(100);
+  for(int i = 0; i < 5; i++) {
+    digitalWrite(PIN_BUZZER, HIGH); // Sound buzzer
+    delay(250);                     // 250ms tone duration
+    digitalWrite(PIN_BUZZER, LOW);  // Turn off
+    if (i < 4) {
+      delay(2000);                  // 2-second gap between alerts
+    }
   }
 }`,
     whyChosenByTCE: "Provides immediate local feedback even when home Wi-Fi is disconnected or smartphone notifications are muted."
