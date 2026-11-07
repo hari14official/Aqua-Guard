@@ -210,10 +210,24 @@ class SoundService {
 
   /**
    * Affirmative notification chime for tank full, valve opened, or gateway reconnect.
-   * Plays 5 times with a 2-second gap (2000ms) by default.
+   * Plays 5 times with a 2-second gap (2000ms) by default, or specified count.
    */
   public playNotification(count: number = 5, gapMs: number = 2000) {
     this.playSequence(() => this.playNotificationSingle(), count, gapMs);
+  }
+
+  /**
+   * Tank Full Notification - plays sound exactly ONE time.
+   */
+  public playTankFullAlert() {
+    this.playNotification(1);
+  }
+
+  /**
+   * Tank Drain / Low Level Warning (<= 20%) - plays sound exactly ONE time.
+   */
+  public playTankDrainAlert() {
+    this.playWarning(1);
   }
 
   /**

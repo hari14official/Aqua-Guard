@@ -145,19 +145,21 @@ export const TankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAlerts((prev) => [newAlert, ...prev.slice(0, 49)]);
 
     if (soundEnabled) {
-      // Play alert sound 5 times with a 2-second gap
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-          if (!soundEnabled) return;
-          if (severity === 'critical') {
+      if (severity === 'critical') {
+        // Critical alerts play 5 times with 2-second gap
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            if (!soundEnabled) return;
             playBeep(920, 0.25, 'sawtooth');
             setTimeout(() => playBeep(740, 0.35, 'sawtooth'), 150);
-          } else if (severity === 'warning') {
-            playBeep(640, 0.2, 'triangle');
-          } else {
-            playBeep(523, 0.18, 'sine');
-          }
-        }, i * 2000);
+          }, i * 2000);
+        }
+      } else if (severity === 'warning') {
+        // Tank Drain / Low Level Warning: play sound ONLY ONE time
+        playBeep(640, 0.2, 'triangle');
+      } else {
+        // Tank Full / Operational Notice: play sound ONLY ONE time
+        playBeep(523, 0.18, 'sine');
       }
     }
   };

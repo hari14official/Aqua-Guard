@@ -107,15 +107,15 @@ export const App: React.FC = () => {
           soundService.playAlarm();
         }
 
-        // 4. Low Water Level Warning
+        // 4. Low Water Level / Tank Drain Warning (Plays sound ONLY ONE time)
         if (state.levelPercent <= 20 && prev.levelPercent > 20) {
-          soundService.playWarning();
+          soundService.playTankDrainAlert();
           showToast('⚠️ WARNING: Tank level LOW (≤ 20%). Refill cycle initiated.', 'warning');
         }
 
-        // 5. Full Tank Capacity Notice
+        // 5. Full Tank Capacity Notice (Plays sound ONLY ONE time)
         if (state.levelPercent >= 90 && prev.levelPercent < 90) {
-          soundService.playNotification();
+          soundService.playTankFullAlert();
           showToast('✅ TANK FULL: Reached 90% capacity. Inlet valve closed.', 'success');
         }
 

@@ -310,7 +310,7 @@ void evaluatePumpAutomation(float levelPercent, bool isWaterClean) {
     howItWorks: {
       physicalPrinciple: "Contains an internal multivibrator that oscillates automatically at 2.3 kHz when DC voltage is applied across its piezoelectric ceramic diaphragm.",
       signalProcessing: "Driven via 2N2222 NPN transistor buffer or directly from GPIO23 with current limiting.",
-      esp32Interaction: "Pulsed alarm sequence: 5 alert pulses with 2-second gap (250ms ON / 2000ms OFF) during contamination or intrusion alert; continuous status LED interlock.",
+      esp32Interaction: "Pulsed alarm sequence: 5 alert pulses with 2-second gap (250ms ON / 2000ms OFF) during contamination or intrusion alert; single chime on tank full or drain notification; continuous status LED interlock.",
       failSafeMechanism: "Buzzer pulses exactly 5 times with 2-second interval upon hazard trigger to alert occupants without continuous neighborhood disturbance, while visual Red LED remains locked ON."
     },
     specs: [
