@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { WaterQuotes } from './components/WaterQuotes';
@@ -23,6 +23,7 @@ import { TermsOfUsePage } from './components/TermsOfUsePage';
 import { ContactPage } from './components/ContactPage';
 
 import { tankService } from './services/tankService';
+import { soundService } from './services/soundService';
 import { TankLiveState, TankHistoryItem, TankEvent, SmartAlert, OperationMode } from './types/tank';
 import { CheckCircle2, AlertTriangle, Info, ShieldAlert, X } from 'lucide-react';
 
@@ -52,6 +53,20 @@ export const App: React.FC = () => {
   const [events, setEvents] = useState<TankEvent[]>(tankService.getEvents());
   const [alerts, setAlerts] = useState<SmartAlert[]>(tankService.getAlerts());
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const prevStateRef = useRef<TankLiveState | null>(null);
+
+  const showToast = (message: string, type: 'info' | 'warning' | 'error' | 'success') => {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+
+    if (type === 'error' && "Notification" in window && Notification.permission === "granted") {
+      new Notification("AquaGuard Alert", { body: message });
+    }
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4500);
+  };
 
   // Dark mode effect
   useEffect(() => {
@@ -64,13 +79,59 @@ export const App: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  // Subscribe to tankService
+  // Subscribe to real-time tankService stream & dispatch audio/visual alerts
   useEffect(() => {
     const unsubscribe = tankService.subscribe((state) => {
+      const prev = prevStateRef.current;
       setLiveState(state);
       setHistory(tankService.getHistory());
       setEvents(tankService.getEvents());
       setAlerts(tankService.getAlerts());
+
+      if (prev) {
+        // 1. Critical Contamination Hazard
+        if (state.turbidityStatus === 'DIRTY' && prev.turbidityStatus !== 'DIRTY') {
+          soundService.playAlarm();
+          showToast(`🚨 CRITICAL HAZARD: Contaminated water detected (${state.turbidityNTU} NTU)! Inlet closed.`, 'error');
+        }
+
+        // 2. IR Lid Tampering / Intrusion Hazard
+        if (state.objectDetected && !prev.objectDetected) {
+          soundService.playAlarm();
+          showToast('🚨 SECURITY ALERT: Reservoir lid opened / unauthorized intrusion detected!', 'error');
+        }
+
+        // 3. Hardware Buzzer Active Transition
+        if (state.alarm && !prev.alarm) {
+          soundService.playAlarm();
+        }
+
+        // 4. Low Water Level Warning
+        if (state.levelPercent <= 20 && prev.levelPercent > 20) {
+          soundService.playWarning();
+          showToast('⚠️ WARNING: Tank level LOW (≤ 20%). Refill cycle initiated.', 'warning');
+        }
+
+        // 5. Full Tank Capacity Notice
+        if (state.levelPercent >= 90 && prev.levelPercent < 90) {
+          soundService.playNotification();
+          showToast('✅ TANK FULL: Reached 90% capacity. Inlet valve closed.', 'success');
+        }
+
+        // 6. Hardware Disconnect Alert
+        if (!state.isOnline && prev.isOnline) {
+          soundService.playWarning();
+          showToast('🔌 HARDWARE OFFLINE: ESP32 telemetry gateway disconnected.', 'warning');
+        }
+
+        // 7. Hardware Reconnected
+        if (state.isOnline && !prev.isOnline) {
+          soundService.playNotification();
+          showToast('🟢 HARDWARE ONLINE: ESP32 telemetry stream established.', 'success');
+        }
+      }
+
+      prevStateRef.current = state;
     });
 
     return () => unsubscribe();
@@ -115,19 +176,6 @@ export const App: React.FC = () => {
     else if (view === 'privacy') window.location.hash = '#privacy';
     else if (view === 'contact') window.location.hash = '#contact-page';
     else window.location.hash = '#home';
-  };
-
-  const showToast = (message: string, type: 'info' | 'warning' | 'error' | 'success') => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
-
-    if (type === 'error' && "Notification" in window && Notification.permission === "granted") {
-      new Notification("AquaGuard Alert", { body: message });
-    }
-
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
   };
 
   const removeToast = (id: string) => {

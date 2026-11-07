@@ -14,9 +14,12 @@ import {
   AlertTriangle,
   CheckCircle2,
   Trash2,
-  Home
+  Home,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { TankLiveState, SmartAlert } from '../types/tank';
+import { soundService } from '../services/soundService';
 
 interface NavbarProps {
   liveState: TankLiveState;
@@ -44,7 +47,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(soundService.isMuted());
   const notifRef = useRef<HTMLDivElement>(null);
+
+  const handleToggleSound = () => {
+    const nextMuted = soundService.toggleMute();
+    setIsMuted(nextMuted);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -256,6 +265,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* Sound Alert Toggle */}
+              <button
+                onClick={handleToggleSound}
+                aria-label={isMuted ? "Enable Audio Alerts" : "Mute Audio Alerts"}
+                className={`p-2.5 rounded-xl border transition-colors ${
+                  isMuted
+                    ? 'text-slate-400 dark:text-slate-500 border-slate-200 dark:border-navy-700 hover:bg-slate-100 dark:hover:bg-navy-900'
+                    : 'text-brand-600 dark:text-cyan-400 border-brand-300 dark:border-cyan-700/60 bg-brand-50/50 dark:bg-cyan-950/30 hover:bg-brand-100/50'
+                }`}
+                title={isMuted ? "Sound Alerts Muted (Click to Enable)" : "Real-Time Sound Alerts Active (Click to Mute)"}
+              >
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
 
               {/* Theme Toggle */}
               <button

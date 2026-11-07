@@ -7,7 +7,13 @@ class TankService {
   private useFirebase: boolean = false;
   private subscribers: Array<(state: TankLiveState) => void> = [];
   private currentState: TankLiveState | null = null;
+  private prevState: TankLiveState | null = null;
   private offlineCheckInterval: number | null = null;
+
+  // Real-time tracking buffers for live Firebase hardware
+  private firebaseHistory: TankHistoryItem[] = [];
+  private firebaseEvents: TankEvent[] = [];
+  private firebaseAlerts: SmartAlert[] = [];
 
   constructor() {
     // Check if Firebase is configured via .env AND mode is not explicitly forced to SIMULATION
@@ -68,7 +74,7 @@ class TankService {
           fullSensor: Boolean(data.fullSensor),
           turbidityVoltage: Number(data.turbidityVoltage || 4.1),
           turbidityNTU: Number(data.turbidityNTU || 5),
-          turbidityStatus: data.turbidityStatus || 'CLEAR',
+          turbidityStatus: data.turbidityStatus || (Number(data.turbidityVoltage || 4.1) < 2.5 ? 'DIRTY' : Number(data.turbidityVoltage || 4.1) < 3.5 ? 'CLOUDY' : 'CLEAR'),
           objectDetected: Boolean(data.objectDetected),
           pump: Boolean(data.pump),
           valve: Boolean(data.valve),
@@ -84,6 +90,54 @@ class TankService {
           lastSeen: Number(data.lastSeen || Date.now())
         };
 
+        // Append historical time point
+        const timeNow = Date.now();
+        const historyPoint: TankHistoryItem = {
+          timestamp: timeNow,
+          timeLabel: new Date(timeNow).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          levelPercent: liveState.levelPercent,
+          turbidityVoltage: liveState.turbidityVoltage,
+          pumpState: liveState.pump,
+          valveState: liveState.valve
+        };
+        this.firebaseHistory.push(historyPoint);
+        if (this.firebaseHistory.length > 25) this.firebaseHistory.shift();
+
+        // Process state transitions for live alerts & events
+        if (this.prevState) {
+          const prev = this.prevState;
+
+          // 1. Turbidity Contamination Spike
+          if (liveState.turbidityStatus === 'DIRTY' && prev.turbidityStatus !== 'DIRTY') {
+            this.addFirebaseAlert('HIGH', 'Turbidity Contamination Alert', `Inflowing water quality degraded (${liveState.turbidityNTU} NTU). Inlet valve automatically clamped shut.`);
+            this.addFirebaseEvent('CRITICAL', 'Contamination Detected', `Turbidity sensor triggered: ${liveState.turbidityVoltage.toFixed(2)}V (${liveState.turbidityNTU} NTU).`);
+          }
+
+          // 2. IR Lid Tampering / Intrusion
+          if (liveState.objectDetected && !prev.objectDetected) {
+            this.addFirebaseAlert('HIGH', 'Lid Tampering / Intrusion Alert', 'Top access hatch opened or unauthorized object detected. Hardware buzzer sounding.');
+            this.addFirebaseEvent('CRITICAL', 'Lid Opened', 'IR proximity sensor triggered at tank cover.');
+          }
+
+          // 3. Low Water Threshold reached
+          if (liveState.levelPercent <= 20 && prev.levelPercent > 20) {
+            this.addFirebaseAlert('MEDIUM', 'Low Water Level', 'Tank depleted to 20%. Refill sequence initiated.');
+            this.addFirebaseEvent('WARNING', 'Low Level (20%)', 'LOW probe un-submerged.');
+          }
+
+          // 4. Full Water Threshold reached
+          if (liveState.levelPercent >= 90 && prev.levelPercent < 90) {
+            this.addFirebaseAlert('LOW', 'Tank Full', 'Tank reached 90% capacity. Inlet valve closed.');
+            this.addFirebaseEvent('INFO', 'Tank Full (90%)', 'FULL probe submerged. Auto cutoff asserted.');
+          }
+
+          // 5. Pump State Change
+          if (liveState.pump !== prev.pump) {
+            this.addFirebaseEvent(liveState.pump ? 'INFO' : 'WARNING', liveState.pump ? 'Pump Started' : 'Pump Stopped', liveState.pump ? 'Distribution pump started.' : 'Pump deactivated.');
+          }
+        }
+
+        this.prevState = liveState;
         this.currentState = liveState;
         this.notifySubscribers(liveState);
       }
@@ -137,23 +191,65 @@ class TankService {
     return simulationEngine.getState();
   }
 
+  private addFirebaseAlert(severity: 'HIGH' | 'MEDIUM' | 'LOW', title: string, message: string) {
+    const alert: SmartAlert = {
+      id: `live-alt-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      timestamp: Date.now(),
+      severity,
+      title,
+      message,
+      read: false
+    };
+    this.firebaseAlerts.unshift(alert);
+    if (this.firebaseAlerts.length > 30) this.firebaseAlerts.pop();
+  }
+
+  private addFirebaseEvent(type: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS', title: string, description: string) {
+    const evt: TankEvent = {
+      id: `live-evt-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      timestamp: Date.now(),
+      type,
+      title,
+      description
+    };
+    this.firebaseEvents.unshift(evt);
+    if (this.firebaseEvents.length > 50) this.firebaseEvents.pop();
+  }
+
   public getHistory(): TankHistoryItem[] {
+    if (this.useFirebase && this.firebaseHistory.length > 0) {
+      return [...this.firebaseHistory];
+    }
     return simulationEngine.getHistory();
   }
 
   public getEvents(): TankEvent[] {
+    if (this.useFirebase) {
+      return [...this.firebaseEvents];
+    }
     return simulationEngine.getEvents();
   }
 
   public getAlerts(): SmartAlert[] {
+    if (this.useFirebase) {
+      return [...this.firebaseAlerts];
+    }
     return simulationEngine.getAlerts();
   }
 
   public markAlertAsRead(id: string) {
+    if (this.useFirebase) {
+      this.firebaseAlerts = this.firebaseAlerts.map(a => a.id === id ? { ...a, read: true } : a);
+      return;
+    }
     simulationEngine.markAlertAsRead(id);
   }
 
   public clearAllAlerts() {
+    if (this.useFirebase) {
+      this.firebaseAlerts = [];
+      return;
+    }
     simulationEngine.clearAllAlerts();
   }
 
