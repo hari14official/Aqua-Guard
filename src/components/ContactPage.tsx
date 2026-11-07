@@ -124,14 +124,16 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         </div>
       </header>
 
-      {/* 2. FULL-WIDTH WORKING MAP DISPLAYING THIAGARAJAR COLLEGE OF ENGINEERING - MATCHING IMAGE 3 */}
+      {/* 2. FULL-WIDTH WORKING GOOGLE MAP DISPLAYING THIAGARAJAR COLLEGE OF ENGINEERING */}
       <section className="relative w-full h-80 sm:h-96 bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-800 overflow-hidden shadow-inner">
-        {/* OpenStreetMap Real-Time Interactive Embed - 100% Reliable without CORS / Frame blocking */}
+        {/* Google Maps Real-Time Interactive Embed */}
         <iframe
-          title="Thiagarajar College of Engineering Interactive Map"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=78.0700%2C9.8750%2C78.0930%2C9.8920&layer=mapnik&marker=9.8828%2C78.0816"
+          title="Thiagarajar College of Engineering Google Map"
+          src="https://maps.google.com/maps?q=Thiagarajar+College+of+Engineering,+Madurai&t=&z=16&ie=UTF8&iwloc=&output=embed"
           className="w-full h-full border-0"
-          loading="eager"
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
         />
 
         {/* Top-Left Map Card Overlay - Exact Match to Reference Image 3 */}
