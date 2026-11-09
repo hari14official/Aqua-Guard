@@ -115,6 +115,22 @@ export const Hero: React.FC<HeroProps> = ({ liveState, onOpenDashboard, onOpenCi
       {/* FULL WIDTH SLIDE WRAPPER - MERGED WITH PAGE (NO HEAVY CARD BLOCK) */}
       <div className="w-full px-4 sm:px-6 lg:px-12 relative z-10">
         
+        {/* Top Left: Made in India Lion Logo (Merged seamlessly with page canvas - no block/container) */}
+        <div className="sm:absolute sm:top-1 sm:left-6 lg:left-12 z-20 flex sm:block items-center justify-start mb-4 sm:mb-0">
+          <div className="relative group inline-flex flex-col items-start transition-all duration-300 cursor-default">
+            {/* Subtle ambient backlight glow that blends organically with the page background */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-orange-500/10 via-cyan-500/10 to-emerald-500/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 dark:opacity-40 dark:group-hover:opacity-80 transition-opacity duration-500 pointer-events-none" />
+            
+            {/* Transparent Made in India Lion Emblem */}
+            <img 
+              src="/assets/made-in-india-lion.png" 
+              alt="Made in India Lion Logo" 
+              className="h-10 sm:h-12 lg:h-14 w-auto object-contain select-none drop-shadow-xs dark:drop-shadow-[0_2px_12px_rgba(34,211,238,0.25)] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300 filter dark:brightness-110"
+              title="Made in India • Indigenous Smart Water Monitoring & Automation Prototype"
+            />
+          </div>
+        </div>
+
         {/* Top Institutional Badge */}
         <div className="flex flex-col items-center justify-center text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50/80 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold shadow-xs mb-3">
